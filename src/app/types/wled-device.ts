@@ -143,6 +143,12 @@ export interface WledState {
   seg: WledSegment[];
 }
 
+// Device Storage Model (with optional device name)
+export interface StoredWledDevice {
+  ip: string;
+  deviceName?: string;
+}
+
 // Full Response
 export interface WledDevice {
   state: WledState;

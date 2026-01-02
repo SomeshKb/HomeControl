@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { WledDevice, WledInfo } from '../types/wled-device';
+import { WledDevice, WledInfo, StoredWledDevice } from '../types/wled-device';
 
 @Injectable({
   providedIn: 'root'
@@ -55,29 +55,35 @@ export class WledHttpService {
   }
 
 
-  saveDeviceOnSessionStorage(ip: string) {
-    console.log('Saving IP to session storage:', ip);
-    const existingIp = sessionStorage.getItem('wledDevices');
-    if (existingIp) {
-      const ipList = existingIp.split(',');
-      if (!ipList.includes(ip)) {
-        sessionStorage.setItem('wledDevices', `${existingIp},${ip}`);
-      }
-    } else {
-      sessionStorage.setItem('wledDevices', ip);
+  saveDeviceOnSessionStorage(ip: string, deviceName?: string) {
+    console.log('Saving device to session storage:', { ip, deviceName });
+    const existingDevices = this.getSavedDevicesFromSessionStorage();
+
+    const deviceExists = existingDevices.some(d => d.ip === ip);
+    if (!deviceExists) {
+      existingDevices.push({ ip, deviceName: deviceName || '' });
+      sessionStorage.setItem('wledDevices', JSON.stringify(existingDevices));
     }
   }
 
   deleteDeviceOnSessionStorage(ip: string) {
-    const existingIp = sessionStorage.getItem('wledDevices');
-    if (existingIp) {
-      const ipList = existingIp.split(',').filter(storedIp => storedIp !== ip);
-      sessionStorage.setItem('wledDevices', ipList.join(','));
-    }
+    const existingDevices = this.getSavedDevicesFromSessionStorage();
+    const filtered = existingDevices.filter(d => d.ip !== ip);
+    sessionStorage.setItem('wledDevices', JSON.stringify(filtered));
   }
 
-  getSavedDevicesFromSessionStorage(): string[] {
-    const existingIp = sessionStorage.getItem('wledDevices');
-    return existingIp ? existingIp.split(',') : [];
+  getSavedDevicesFromSessionStorage(): StoredWledDevice[] {
+    const existingData = sessionStorage.getItem('wledDevices');
+    if (!existingData) {
+      return [];
+    }
+
+    try {
+      return JSON.parse(existingData);
+    } catch {
+      // Fallback for old comma-separated format
+      const ipList = existingData.split(',');
+      return ipList.map(ip => ({ ip: ip.trim(), deviceName: '' }));
+    }
   }
 }

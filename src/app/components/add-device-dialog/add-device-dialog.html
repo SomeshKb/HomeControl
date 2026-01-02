@@ -1,0 +1,41 @@
+<div class="dialog-container">
+  <h2 mat-dialog-title>Add WLED Device</h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="addDeviceForm">
+      <mat-form-field class="full-width">
+        <mat-label>Device Name (Optional)</mat-label>
+        <input
+          matInput
+          formControlName="deviceName"
+          placeholder="e.g., Living Room Lights"
+        />
+      </mat-form-field>
+
+      <mat-form-field class="full-width">
+        <mat-label>WLED IP Address</mat-label>
+        <input
+          matInput
+          formControlName="ipAddress"
+          placeholder="e.g., 192.168.1.50"
+          autocomplete="off"
+        />
+        <mat-error *ngIf="addDeviceForm.get('ipAddress')?.invalid">
+          {{ ipAddressError }}
+        </mat-error>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()">Cancel</button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="onAddDevice()"
+      [disabled]="!addDeviceForm.valid"
+    >
+      Add Device
+    </button>
+  </mat-dialog-actions>
+</div>

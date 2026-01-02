@@ -1,51 +1,83 @@
-<div class="container">
-  <h2>WLED Controller</h2>
+<div class="wled-controller-container">
+  <header class="controller-header">
+    <h1>WLED Controller</h1>
+    <button mat-raised-button color="primary" (click)="openAddDeviceDialog()">
+      <mat-icon>add</mat-icon>
+      Add Device
+    </button>
+  </header>
 
-  <div class="add-device">
-    <input type="text" placeholder="Enter WLED IP (e.g. 192.168.1.50)" [(ngModel)]="newIp" />
-    <button (click)="addDevice()">Add</button>
-  </div>
+  <!-- Universal Control Section -->
+  <mat-card class="universal-control-section">
+    <mat-card-header>
+      <mat-card-title>Universal Control</mat-card-title>
+    </mat-card-header>
 
-  <h3>Universal Control</h3>
-  <div class="universal-control">
-    <span class="material-symbols-outlined on-button" (click)="turnOnAll()">
-      power_settings_new
-    </span>
-
-    <span class="material-symbols-outlined off-button" (click)="turnOffAll()">
-      power_settings_new
-    </span>
-
-    <input type="color" class="color-picker" (change)="onAllColorChange($event)" />
-  </div>
-
-  <div class="device-list-wrapper">
-    <h3>Connected Devices</h3>
-    <div class="device-list">
-      @for(device of devices; track device.info.ip) {
-      <div class="device-details">
-        <p class="device-name">
-          {{ device.info.ip }}
-        </p>
-
-        <span
-          class="material-symbols-outlined"
-          [ngClass]="device.state.on ? 'on-button' : 'off-button'"
-          (click)="device.state.on ? turnOff(device) : turnOn(device)"
+    <mat-card-content>
+      <div class="universal-controls">
+        <button
+          mat-raised-button
+          color="warn"
+          (click)="turnOffAll()"
+          class="control-button"
         >
-          power_settings_new
-        </span>
+          <mat-icon>power_off</mat-icon>
+          Power Off All
+        </button>
 
-        <input
-          class="color-picker"
-          type="color"
-          [value]="getDeviceColor(device)"
-          (change)="onColorChange(device, $event)"
-        />
+        <button
+          mat-raised-button
+          color="accent"
+          (click)="turnOnAll()"
+          class="control-button"
+        >
+          <mat-icon>power_on</mat-icon>
+          Power On All
+        </button>
 
-        <button (click)="openAdvanceOption(device)" >Advance Options</button>
+        <div class="color-control-wrapper">
+          <label for="universal-color-picker">Set Color (All Devices):</label>
+          <!-- <div
+            class="color-preview"
+            id="universal-color-preview"
+            [style.background-color]="universalColor"
+            (click)="universalColorInput.click()"
+          ></div> -->
+          <input
+            #universalColorInput
+            id="universal-color-picker"
+            type="color"
+            [value]="universalColor"
+            class="color-picker"
+            (change)="setColorAll($event)"
+            (input)="onUniversalColorPreview($event)"
+          />
+        </div>
       </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Connected Devices Section -->
+  <section class="devices-section">
+    <h2>Connected Devices</h2>
+    <div class="devices-grid">
+      @if (devicesWithNames.length > 0) {
+        @for(item of devicesWithNames; track item.device.info.ip) {
+          <app-device-card
+            [device]="item.device"
+            [deviceName]="item.deviceName"
+            (powerToggle)="onDevicePowerToggle($event)"
+            (colorChange)="onDeviceColorChange($event)"
+            (advancedOptions)="onDeviceAdvancedOptions($event)"
+          ></app-device-card>
+        }
+      } @else {
+        <div class="no-devices-message">
+          <mat-icon>devices</mat-icon>
+          <p>No devices connected yet.</p>
+          <p>Click the "Add Device" button to get started.</p>
+        </div>
       }
     </div>
-  </div>
+  </section>
 </div>

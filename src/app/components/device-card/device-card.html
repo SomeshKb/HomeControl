@@ -1,0 +1,44 @@
+<mat-card class="device-card">
+  <mat-card-header>
+    <mat-card-title>
+      {{ getDeviceName() }}
+    </mat-card-title>
+    <mat-card-subtitle>{{ device.info.ip }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="device-controls">
+      <button
+        mat-icon-button
+        (click)="onPowerToggle()"
+        [matTooltip]="device.state.on ? 'Power Off' : 'Power On'"
+        class="power-button"
+        [class.on]="device.state.on"
+      >
+        <mat-icon>power_settings_new</mat-icon>
+      </button>
+
+      <div class="color-preview-wrapper">
+        <label for="color-picker-{{ device.info.ip }}" class="color-label">
+          Color:
+        </label>
+        <input
+          #colorPickerInput
+          [id]="'color-picker-' + device.info.ip"
+          type="color"
+          class="color-picker"
+          [value]="getDeviceColor()"
+          (change)="onColorChange($event)"
+          (input)="onColorPreview($event)"
+        />
+      </div>
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button mat-stroked-button (click)="onAdvancedOptions()">
+      <mat-icon>settings</mat-icon>
+      Advanced Options
+    </button>
+  </mat-card-actions>
+</mat-card>

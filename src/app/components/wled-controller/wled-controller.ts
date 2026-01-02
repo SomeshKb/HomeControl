@@ -1,65 +1,152 @@
 import { AfterViewInit, ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { WledHttpService } from '../../services/wled-http-service';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { WledDevice } from '../../types/wled-device';
+import { WledDevice, StoredWledDevice } from '../../types/wled-device';
 import { Router } from '@angular/router';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatDividerModule } from '@angular/material/divider';
+import { AddDeviceDialogComponent } from '../add-device-dialog/add-device-dialog';
+import { DeviceCardComponent } from '../device-card/device-card';
+
+interface DeviceWithName {
+  device: WledDevice;
+  deviceName?: string;
+}
 
 @Component({
   selector: 'app-wled-controller',
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatDividerModule,
+    DeviceCardComponent,
+  ],
   templateUrl: './wled-controller.html',
   styleUrl: './wled-controller.scss',
 })
 export class WledController implements AfterViewInit {
-
-  devices: WledDevice[] = [];
-  newIp = '';
+  devicesWithNames: DeviceWithName[] = [];
+  universalColor: string = '#ffffff';
 
   constructor(
     private wledService: WledHttpService,
     private cdr: ChangeDetectorRef,
-    private router: Router
-  ) {
-  }
+    private router: Router,
+    private dialog: MatDialog
+  ) {}
 
   ngAfterViewInit(): void {
     this.getExistingDevices();
   }
 
-  getExistingDevices() {
-    const savedIps = this.wledService.getSavedDevicesFromSessionStorage();
-    this.devices = [];
+  openAddDeviceDialog(): void {
+    const dialogRef = this.dialog.open(AddDeviceDialogComponent, {
+      width: '400px',
+      disableClose: false,
+    });
 
-    for (const ip of savedIps) {
-      this.wledService.getDeviceDetails(ip).subscribe({
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.wledService.saveDeviceOnSessionStorage(result.ipAddress, result.deviceName);
+        this.getExistingDevices();
+      }
+    });
+  }
+
+  getExistingDevices(): void {
+    const savedDevices = this.wledService.getSavedDevicesFromSessionStorage();
+    this.devicesWithNames = [];
+
+    for (const storedDevice of savedDevices) {
+      this.wledService.getDeviceDetails(storedDevice.ip).subscribe({
         next: (deviceDetails: WledDevice) => {
           console.log('Found device:', deviceDetails);
-          this.devices.push(deviceDetails);
+          this.devicesWithNames.push({
+            device: deviceDetails,
+            deviceName: storedDevice.deviceName,
+          });
           this.cdr.detectChanges();
         },
         error: () => {
-          console.warn(`Device at IP ${ip} is not reachable.`);
-        }
+          console.warn(`Device at IP ${storedDevice.ip} is not reachable.`);
+        },
       });
     }
   }
 
-  addDevice() {
-    if (this.newIp) {
-      this.wledService.saveDeviceOnSessionStorage(this.newIp);
-      this.newIp = '';
-      this.getExistingDevices();
+  onDevicePowerToggle(device: WledDevice): void {
+    if (device.state.on) {
+      this.turnOff(device);
+    } else {
+      this.turnOn(device);
     }
   }
 
-  onColorChange(device: WledDevice, event: Event) {
-    const color = (event.target as HTMLInputElement).value;
+  onDeviceColorChange(data: { device: WledDevice; color: string }): void {
+    const { device, color } = data;
     const { r, g, b } = this.hexToRgb(color);
-    this.wledService.setColor(device.info.ip, r, g, b).subscribe();
+    this.wledService.setColor(device.info.ip, r, g, b).subscribe({
+      next: () => {
+        // Update the local state
+        if (device.state.seg && device.state.seg.length > 0) {
+          device.state.seg[0].col = [[r, g, b]];
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => {
+        console.error('Failed to set color:', err);
+      },
+    });
   }
 
-  turnOff(device: WledDevice) {
+  onDeviceAdvancedOptions(device: WledDevice): void {
+    console.log('Opening advanced options for device:', device.info.ip);
+    this.router.navigate(['/wled-device', device.info.ip]);
+  }
+
+  turnOnAll(): void {
+    for (const { device } of this.devicesWithNames) {
+      this.turnOn(device);
+    }
+  }
+
+  turnOffAll(): void {
+    for (const { device } of this.devicesWithNames) {
+      this.turnOff(device);
+    }
+  }
+
+  setColorAll(event: Event): void {
+    const color = (event.target as HTMLInputElement).value;
+    this.universalColor = color;
+    const { r, g, b } = this.hexToRgb(color);
+    for (const { device } of this.devicesWithNames) {
+      this.wledService.setColor(device.info.ip, r, g, b).subscribe({
+        next: () => {
+          if (device.state.seg && device.state.seg.length > 0) {
+            device.state.seg[0].col = [[r, g, b]];
+            this.cdr.detectChanges();
+          }
+        },
+        error: (err) => {
+          console.error('Failed to set color on all devices:', err);
+        },
+      });
+    }
+  }
+
+  onUniversalColorPreview(event: Event): void {
+    const color = (event.target as HTMLInputElement).value;
+    this.universalColor = color;
+  }
+
+  private turnOff(device: WledDevice): void {
     this.wledService.turnOff(device.info.ip).subscribe({
       next: () => {
         device.state.on = false;
@@ -68,11 +155,11 @@ export class WledController implements AfterViewInit {
       error: () => {
         device.state.on = true;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
-  turnOn(device: WledDevice) {
+  private turnOn(device: WledDevice): void {
     this.wledService.turnOn(device.info.ip).subscribe({
       next: () => {
         device.state.on = true;
@@ -81,7 +168,7 @@ export class WledController implements AfterViewInit {
       error: () => {
         device.state.on = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
@@ -90,39 +177,7 @@ export class WledController implements AfterViewInit {
     return {
       r: (bigint >> 16) & 255,
       g: (bigint >> 8) & 255,
-      b: bigint & 255
+      b: bigint & 255,
     };
-  }
-
-  getDeviceColor(device: WledDevice): string {
-    if (device.state.seg && device.state.seg.length > 0) {
-      const col = device.state.seg[0].col;
-      if (col && col.length > 0) {
-        const [r, g, b] = col[0];
-        return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
-      }
-    }
-    return "";
-  }
-
-  turnOnAll(){
-    this.devices.forEach(device => this.turnOn(device));
-  }
-  turnOffAll() {
-    this.devices.forEach(device => this.turnOff(device));
-  }
-
-  onAllColorChange(event: Event) {
-    const color = (event.target as HTMLInputElement).value;
-    const { r, g, b } = this.hexToRgb(color);
-    this.devices.forEach(device => {
-      this.wledService.setColor(device.info.ip, r, g, b).subscribe();
-    });
-
-    this.getExistingDevices();
-  }
-
-  openAdvanceOption(device: WledDevice) {
-    this.router.navigateByUrl(`/wled-device/${device.info.ip}`);
   }
 }

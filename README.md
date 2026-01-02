@@ -1,52 +1,210 @@
-# HomeControl
+# WLED Controller
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.5.
+A modern Angular application for controlling WLED (WiFi LED) devices on your network with a beautiful Material Design interface.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- ✨ **Material Design UI** - Modern, professional interface
+- 🎨 **Color Control** - Set colors on individual or all devices
+- 💡 **Power Management** - Turn devices on/off individually or in bulk
+- 📱 **Responsive Design** - Works on desktop, tablet, and mobile
+- 🔐 **Form Validation** - IPv4 validation for device IP addresses
+- 🎯 **Component-Based** - Clean, modular architecture
+- ⚡ **Reactive Forms** - Robust form handling with validation
 
+## Quick Start
+
+### Prerequisites
+- Node.js v22.20.0 or higher
+- npm (comes with Node.js)
+
+### Installation
+
+1. Install dependencies:
 ```bash
-ng serve
+npm install
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
+2. Start the development server:
 ```bash
-ng generate component component-name
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+3. Open your browser and navigate to `http://localhost:4200/`
 
-```bash
-ng generate --help
+## Usage
+
+### Adding a WLED Device
+
+1. Click the **"+ Add Device"** button in the top right
+2. Enter the device name (optional) and IP address (required)
+3. Click **"Add Device"**
+4. The device will appear in the "Connected Devices" section
+
+### Controlling Devices
+
+**Individual Device:**
+- Toggle power with the power button
+- Change color with the color picker
+- Open advanced options (for future implementation)
+
+**All Devices (Universal Control):**
+- Use "Power On All" / "Power Off All" buttons
+- Use the color picker to set all devices to the same color
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── components/
+│   │   ├── add-device-dialog/        # Device addition modal
+│   │   ├── device-card/              # Individual device card
+│   │   ├── wled-controller/          # Main controller
+│   │   └── wled-device-details/      # (future)
+│   ├── services/
+│   │   └── wled-http-service.ts      # HTTP communication
+│   ├── types/
+│   │   └── wled-device.ts            # TypeScript interfaces
+│   └── validators/
+│       └── ipv4.validator.ts         # IPv4 validation
+├── styles.scss                        # Global styles
+└── index.html                         # Main HTML
 ```
 
-## Building
+## Architecture
 
-To build the project run:
+### Components
 
-```bash
-ng build
+- **WledController**: Main component orchestrating the app
+- **AddDeviceDialogComponent**: Modal for adding new devices
+- **DeviceCardComponent**: Reusable card for displaying device info and controls
+
+### Services
+
+- **WledHttpService**: Handles all HTTP communication with WLED devices
+- Uses session storage to persist device list
+
+### Validation
+
+- **IPv4Validator**: Custom validator for IP address field
+
+## API Integration
+
+The app communicates with WLED devices using their HTTP JSON API:
+
+```
+GET http://<device-ip>/json         # Get device state and info
+POST http://<device-ip>/json/state  # Set device state
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Example Requests
 
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
-
+**Turn device on:**
 ```bash
-ng test
+POST http://192.168.1.50/json/state
+{"on": true}
 ```
 
-## Running end-to-end tests
+**Set color (RGB):**
+```bash
+POST http://192.168.1.50/json/state
+{"seg": [{"col": [[255, 0, 0]]}]}
+```
 
-For end-to-end (e2e) testing, run:
+## Technologies Used
+
+- **Angular 20** - Frontend framework
+- **Angular Material** - UI components
+- **RxJS** - Reactive programming
+- **TypeScript** - Type-safe development
+- **SCSS** - Styling
+- **Reactive Forms** - Form handling
+
+## Development
+
+### Code Scaffolding
+
+Generate a new component:
+```bash
+ng generate component components/component-name
+```
+
+### Running Tests
+
+Execute unit tests:
+```bash
+npm test
+```
+
+## Building for Production
+
+Build optimized production artifacts:
+```bash
+npm run build
+```
+
+Artifacts will be in the `dist/` directory.
+
+## Browser Support
+
+- Chrome/Edge (latest 2 versions)
+- Firefox (latest 2 versions)
+- Safari (latest 2 versions)
+- Responsive design for all screen sizes
+
+## Configuration Files
+
+- `angular.json` - Angular CLI configuration
+- `tsconfig.json` - TypeScript configuration
+- `tsconfig.app.json` - App-specific TypeScript config
+- `tsconfig.spec.json` - Test-specific TypeScript config
+
+## Documentation
+
+- [INSTALLATION.md](./INSTALLATION.md) - Detailed setup and usage guide
+- [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) - Technical implementation details
+- [UI_DESIGN_REFERENCE.md](./UI_DESIGN_REFERENCE.md) - UI layout and design guidelines
+
+## Troubleshooting
+
+### Devices won't connect
+- Verify WLED devices are on the same network
+- Check IP addresses are correct and accessible
+- Ensure WLED firmware is up to date
+
+### Material icons not showing
+- Material icon fonts are loaded from Google Fonts (internet required)
+- Check network connectivity
+
+### Form validation not working
+- Ensure Angular forms module is properly imported
+- Check browser console for errors
+
+## Future Enhancements
+
+- [ ] Device grouping/zones
+- [ ] Brightness control
+- [ ] Effect selection
+- [ ] Scene/preset management
+- [ ] Real-time status polling
+- [ ] Device discovery
+- [ ] LocalStorage persistence
+- [ ] Multi-language support
+- [ ] Dark mode
+- [ ] Advanced device settings panel
+
+## License
+
+This project is provided as-is for personal use.
+
+## Support
+
+For issues or questions, please refer to the documentation files or check the WLED project documentation at [wled.me](https://wled.me)
+
+---
+
+**Status**: ✅ Latest version with Material Design UI (Angular 20)
 
 ```bash
 ng e2e
