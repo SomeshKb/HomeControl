@@ -1,10 +1,9 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { WledController } from "./components/wled-controller/wled-controller";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, WledController],
+  imports: [RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

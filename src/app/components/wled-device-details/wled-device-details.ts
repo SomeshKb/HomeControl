@@ -4,10 +4,14 @@ import { WledHttpService } from '../../services/wled-http-service';
 import { WledDevice } from '../../types/wled-device';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
 
 @Component({
   selector: 'app-wled-device-details',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatCardModule, MatButtonModule, MatIconModule, MatDividerModule],
   templateUrl: './wled-device-details.html',
   styleUrl: './wled-device-details.scss',
 })
@@ -54,6 +58,41 @@ export class WledDeviceDetails implements AfterViewInit {
     });
   }
 
+  getDeviceColor(): string {
+    try {
+      const col = this.deviceDetails?.state?.seg?.[0]?.col?.[0];
+      if (!col || col.length < 3) return '#ffffff';
+      const [r, g, b] = col;
+      return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+    } catch {
+      return '#ffffff';
+    }
+  }
+
+  onColorChange(event: Event) {
+    const color = (event.target as HTMLInputElement).value;
+    const { r, g, b } = this.hexToRgb(color);
+    if (!this.deviceDetails) return;
+    this.wledService.setColor(this.ip, r, g, b).subscribe({
+      next: () => {
+        if (this.deviceDetails?.state?.seg && this.deviceDetails.state.seg.length > 0) {
+          this.deviceDetails.state.seg[0].col = [[r, g, b]];
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => console.error('Failed to set color:', err)
+    });
+  }
+
+  private hexToRgb(hex: string) {
+    const bigint = parseInt(hex.replace('#', ''), 16);
+    return {
+      r: (bigint >> 16) & 255,
+      g: (bigint >> 8) & 255,
+      b: bigint & 255,
+    };
+  }
+
   formatUptime(uptimeSeconds: number | undefined): string {
     if (!uptimeSeconds) return '—';
     const s = Number(uptimeSeconds);
@@ -69,9 +108,38 @@ export class WledDeviceDetails implements AfterViewInit {
   }
 
   turnOn() {
-
+    if (!this.deviceDetails) return;
+    this.wledService.turnOn(this.ip).subscribe({
+      next: () => {
+        if (this.deviceDetails) {
+          this.deviceDetails.state.on = true;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {
+        if (this.deviceDetails) {
+          this.deviceDetails.state.on = false;
+          this.cdr.detectChanges();
+        }
+      }
+    });
   }
   turnOff() {
-
+    if (!this.deviceDetails) return;
+    this.wledService.turnOff(this.ip).subscribe({
+      next: () => {
+        if (this.deviceDetails) {
+          this.deviceDetails.state.on = false;
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {
+        if (this.deviceDetails) {
+          this.deviceDetails.state.on = true;
+          this.cdr.detectChanges();
+        }
+      }
+    });
   }
 }
+

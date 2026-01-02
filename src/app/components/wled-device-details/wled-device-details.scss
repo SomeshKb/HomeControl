@@ -1,44 +1,95 @@
 :host {
 	display: block;
 	font-family: Arial, Helvetica, sans-serif;
+	padding: 20px;
+	max-width: 900px;
+	margin: 0 auto;
 }
 
-.device-info {
+.device-card {
 	background: #fff;
-	padding: 12px;
-	border-radius: 6px;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.06);
-	margin-bottom: 12px;
+	border-radius: 8px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+	overflow: hidden;
 }
 
-.device-name {
-	margin: 0 0 8px 0;
+.device-card mat-card-header {
+	padding: 16px 20px;
+}
+
+.device-card mat-card-title {
+	font-size: 20px;
+	color: #222;
+}
+
+.device-card mat-card-subtitle {
+	color: #666;
 }
 
 .meta {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-	gap: 8px;
-	margin-bottom: 10px;
+	gap: 10px;
+	margin-bottom: 14px;
 	font-size: 13px;
-	color: #333;
+	color: #444;
 }
 
-.controls {
+.device-controls {
 	display: flex;
-	gap: 8px;
+	gap: 12px;
+	align-items: center;
+	margin-bottom: 12px;
 }
 
-.btn {
-	padding: 6px 10px;
-	border: 1px solid #ccc;
-	background: #f6f6f6;
-	border-radius: 4px;
+.power-button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	border-radius: 6px;
+	background: transparent;
+	border: 1px solid transparent;
 	cursor: pointer;
 }
 
+.color-preview-wrapper {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-left: 8px;
+}
+
+.color-label {
+	font-size: 14px;
+	color: #666;
+	white-space: nowrap;
+}
+
+.color-picker {
+	cursor: pointer;
+	width: 44px;
+	height: 36px;
+	border: none;
+	border-radius: 6px;
+	padding: 0;
+	flex-shrink: 0;
+
+	&::-webkit-color-swatch-wrapper {
+		padding: 0;
+	}
+
+	&::-webkit-color-swatch {
+		border: none;
+		border-radius: 6px;
+	}
+}
+
 .device-effects h3 {
-	margin: 8px 0;
+	margin: 8px 0 12px 0;
+	font-size: 16px;
+	color: #333;
 }
 
 .effects-list {
@@ -47,7 +98,7 @@
 	margin: 0;
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-	gap: 6px;
+	gap: 8px;
 }
 
 .effects-list li {
@@ -57,25 +108,25 @@
 .effect-btn {
 	width: 100%;
 	text-align: left;
-	padding: 8px;
-	border: 1px solid #e6e6e6;
+	padding: 10px;
+	border: 1px solid #ececec;
 	cursor: pointer;
-	border-radius: 6px;
+	border-radius: 8px;
 }
 
 .effects-list li.active .effect-btn {
-	background: linear-gradient(90deg,#ffd54d,#ffb74d);
+	background: linear-gradient(90deg, #ffd54d, #ffb74d);
 	color: #222;
 	border-color: #ffb74d;
 }
 
+@media (max-width: 768px) {
+	:host {
+		padding: 12px;
+	}
 
-.on-button{
-  color: green;
-  cursor: pointer;
-}
-
-.off-button{
-  color: red;
-  cursor: pointer;
+	.device-controls {
+		flex-direction: column;
+		align-items: flex-start;
+	}
 }
