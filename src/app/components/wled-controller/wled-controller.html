@@ -1,0 +1,51 @@
+<div class="container">
+  <h2>WLED Controller</h2>
+
+  <div class="add-device">
+    <input type="text" placeholder="Enter WLED IP (e.g. 192.168.1.50)" [(ngModel)]="newIp" />
+    <button (click)="addDevice()">Add</button>
+  </div>
+
+  <h3>Universal Control</h3>
+  <div class="universal-control">
+    <span class="material-symbols-outlined on-button" (click)="turnOnAll()">
+      power_settings_new
+    </span>
+
+    <span class="material-symbols-outlined off-button" (click)="turnOffAll()">
+      power_settings_new
+    </span>
+
+    <input type="color" class="color-picker" (change)="onAllColorChange($event)" />
+  </div>
+
+  <div class="device-list-wrapper">
+    <h3>Connected Devices</h3>
+    <div class="device-list">
+      @for(device of devices; track device.info.ip) {
+      <div class="device-details">
+        <p class="device-name">
+          {{ device.info.ip }}
+        </p>
+
+        <span
+          class="material-symbols-outlined"
+          [ngClass]="device.state.on ? 'on-button' : 'off-button'"
+          (click)="device.state.on ? turnOff(device) : turnOn(device)"
+        >
+          power_settings_new
+        </span>
+
+        <input
+          class="color-picker"
+          type="color"
+          [value]="getDeviceColor(device)"
+          (change)="onColorChange(device, $event)"
+        />
+
+        <button (click)="openAdvanceOption(device)" >Advance Options</button>
+      </div>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+.container {
+  padding: 20px;
+}
+
+.add-device {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.device-list-wrapper {
+
+  .device-list {
+    width: 80%;
+
+    .device-details {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      width: 60%;
+      justify-content: space-between;
+
+      .device-name {
+        width: 30%;
+        font-weight: bold;
+        margin-right: 10px;
+      }
+
+      .device-power-button {
+        margin-left: 10px;
+      }
+    }
+  }
+}
+
+.universal-control {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 50%;
+}
+
+.color-picker {
+  border: none;
+  border-radius: 10px;
+  width: 45px;
+  height: 45px;
+  margin: 0px;
+}
+
+.off-button {
+  cursor: pointer;
+  font-size: 24px;
+  margin-left: 10px;
+  color: red;
+  font-weight: bold;
+}
+
+.on-button {
+  cursor: pointer;
+  font-size: 24px;
+  margin-left: 10px;
+  color: green;
+  font-weight: bold;
+}

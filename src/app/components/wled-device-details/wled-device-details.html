@@ -1,0 +1,38 @@
+<div class="device-info">
+  @if(deviceDetails) {
+
+  <h2 class="device-name">{{ deviceDetails.info.name || deviceDetails.info.brand }}</h2>
+
+  <div class="meta">
+    <div><strong>IP:</strong> {{ deviceDetails.info.ip || ip }}</div>
+    <div><strong>MAC:</strong> {{ deviceDetails.info.mac }}</div>
+    <div><strong>Version:</strong> {{ deviceDetails.info.ver }}</div>
+    <div><strong>LEDs:</strong> {{ deviceDetails.info.leds.count }}</div>
+    <div><strong>Uptime:</strong> {{ formatUptime(deviceDetails.info.uptime) }}</div>
+  </div>
+  }
+
+  <div class="controls">
+    <span class="material-symbols-outlined on-button" (click)="turnOn()"> power_settings_new </span
+    >`
+
+    <span class="material-symbols-outlined off-button" (click)="turnOff()">
+      power_settings_new
+    </span>
+  </div>
+</div>
+
+@if(effects && effects.length) {
+<div class="device-effects">
+  <h3>Effects ({{ effects.length }})</h3>
+  <ul class="effects-list">
+    @for(effect of effects;track effect;let i = $index) {
+    <li [class.active]="deviceDetails?.state?.seg?.[0]?.fx === i">
+      <button class="effect-btn" (click)="applyEffect(i)">{{ i }} — {{ effect }}</button>
+    </li>
+    }
+  </ul>
+</div>
+}
+
+<div *ngIf="!deviceDetails">Loading device details...</div>
