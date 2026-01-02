@@ -39,7 +39,7 @@ export class WledController implements AfterViewInit {
     private cdr: ChangeDetectorRef,
     private router: Router,
     private dialog: MatDialog
-  ) {}
+  ) { }
 
   ngAfterViewInit(): void {
     this.getExistingDevices();
@@ -107,7 +107,8 @@ export class WledController implements AfterViewInit {
 
   onDeviceAdvancedOptions(device: WledDevice): void {
     console.log('Opening advanced options for device:', device.info.ip);
-    this.router.navigate(['/wled-device', device.info.ip]);
+    // this.router.navigate(['/wled-device', device.info.ip]);
+    window.open(`http://${device.info.ip}/`, '_blank');
   }
 
   turnOnAll(): void {
