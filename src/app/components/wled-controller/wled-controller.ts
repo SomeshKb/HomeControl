@@ -111,6 +111,13 @@ export class WledController implements AfterViewInit {
     window.open(`http://${device.info.ip}/`, '_blank');
   }
 
+  onDeleteDevice(device: WledDevice): void {
+    // Remove from session storage and local list
+    this.wledService.deleteDeviceOnSessionStorage(device.info.ip);
+    this.devicesWithNames = this.devicesWithNames.filter(d => d.device.info.ip !== device.info.ip);
+    this.cdr.detectChanges();
+  }
+
   turnOnAll(): void {
     for (const { device } of this.devicesWithNames) {
       this.turnOn(device);

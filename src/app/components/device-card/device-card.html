@@ -35,10 +35,19 @@
     </div>
   </mat-card-content>
 
-  <mat-card-actions>
+  <mat-card-actions class="action-wrapper">
     <button mat-stroked-button (click)="onAdvancedOptions()">
       <mat-icon>settings</mat-icon>
       Advanced Options
+    </button>
+    <button
+      mat-icon-button
+      color="warn"
+      (click)="onDelete()"
+      matTooltip="Remove device"
+      aria-label="Remove device"
+    >
+      <mat-icon>delete</mat-icon>
     </button>
   </mat-card-actions>
 </mat-card>

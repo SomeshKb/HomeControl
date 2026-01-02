@@ -52,20 +52,12 @@
   white-space: nowrap;
 }
 
-.color-preview {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-  cursor: pointer;
-}
-
   .color-picker {
     cursor: pointer;
-    width: 60px;
-    height: 50px;
+    width: 30px;
+    height: 30px;
     border: none;
-    border-radius: 4px;
+    border-radius: 40px;
     padding: 0;
     flex-shrink: 0;
 
@@ -85,9 +77,11 @@ mat-card-content + mat-card-actions {
 }
 
 mat-card-actions {
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 16px;
   button {
     min-width: auto;
-
     mat-icon {
       margin-right: 8px;
     }

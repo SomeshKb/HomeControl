@@ -26,6 +26,7 @@ export class DeviceCardComponent {
   @Output() powerToggle = new EventEmitter<WledDevice>();
   @Output() colorChange = new EventEmitter<{ device: WledDevice; color: string }>();
   @Output() advancedOptions = new EventEmitter<WledDevice>();
+  @Output() deleteDevice = new EventEmitter<WledDevice>();
 
   onPowerToggle(): void {
     this.powerToggle.emit(this.device);
@@ -43,6 +44,10 @@ export class DeviceCardComponent {
 
   onAdvancedOptions(): void {
     this.advancedOptions.emit(this.device);
+  }
+
+  onDelete(): void {
+    this.deleteDevice.emit(this.device);
   }
 
   getDeviceName(): string {
